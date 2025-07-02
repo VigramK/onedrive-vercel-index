@@ -1,12 +1,10 @@
 import type { OdFileObject } from '../../types'
-
 import { FC, useEffect, useState } from 'react'
 import { useRouter } from 'next/router'
 import { useTranslation } from 'next-i18next'
-
 import axios from 'axios'
 import toast from 'react-hot-toast'
-import Plyr from 'plyr-react'
+import dynamic from 'next/dynamic'
 import { useAsync } from 'react-async-hook'
 import { useClipboard } from 'use-clipboard-copy'
 
@@ -20,7 +18,17 @@ import FourOhFour from '../FourOhFour'
 import Loading from '../Loading'
 import CustomEmbedLinkMenu from '../CustomEmbedLinkMenu'
 
-import 'plyr-react/plyr.css'
+// Solution 1: Import CSS directly from plyr package (recommended)
+import 'plyr/dist/plyr.css'
+
+// Alternative Solution 2: Dynamic import if needed
+// dynamic(() => import('plyr/dist/plyr.css'), { ssr: false })
+
+// Dynamically import Plyr with SSR disabled
+const Plyr = dynamic(() => import('plyr-react'), {
+  ssr: false,
+  loading: () => <Loading loadingText="Loading player..." />,
+})
 
 const VideoPlayer: FC<{
   videoName: string
@@ -33,74 +41,64 @@ const VideoPlayer: FC<{
   mpegts: any
 }> = ({ videoName, videoUrl, width, height, thumbnail, subtitle, isFlv, mpegts }) => {
   useEffect(() => {
-    // Really really hacky way to inject subtitles as file blobs into the video element
-    axios
-      .get(subtitle, { responseType: 'blob' })
-      .then(resp => {
+    const loadSubtitles = async () => {
+      try {
+        const resp = await axios.get(subtitle, { responseType: 'blob' })
         const track = document.querySelector('track')
         track?.setAttribute('src', URL.createObjectURL(resp.data))
-      })
-      .catch(() => {
+      } catch (error) {
         console.log('Could not load subtitle.')
-      })
-
-    if (isFlv) {
-      const loadFlv = () => {
-        // Really hacky way to get the exposed video element from Plyr
-        const video = document.getElementById('plyr')
-        const flv = mpegts.createPlayer({ url: videoUrl, type: 'flv' })
-        flv.attachMediaElement(video)
-        flv.load()
       }
-      loadFlv()
     }
+
+    const loadFlvPlayer = () => {
+      if (isFlv && mpegts) {
+        const video = document.getElementById('plyr')
+        if (video) {
+          const flv = mpegts.createPlayer({ url: videoUrl, type: 'flv' })
+          flv.attachMediaElement(video)
+          flv.load()
+        }
+      }
+    }
+
+    loadSubtitles()
+    loadFlvPlayer()
   }, [videoUrl, isFlv, mpegts, subtitle])
 
-  // Common plyr configs, including the video source and plyr options
+  // Properly typed Plyr source object
   const plyrSource = {
-    type: 'video',
+    type: 'video' as const,
     title: videoName,
     poster: thumbnail,
-    tracks: [{ kind: 'captions', label: videoName, src: '', default: true }],
+    tracks: [{ kind: 'captions' as const, label: videoName, src: '', default: true }],
+    sources: isFlv ? [] : [{ src: videoUrl, type: 'video/mp4' }]
   }
-  const plyrOptions: Plyr.Options = {
+
+  const plyrOptions = {
     ratio: `${width ?? 16}:${height ?? 9}`,
-    fullscreen: { iosNative: true },
+    fullscreen: { iosNative: true }
   }
-  if (!isFlv) {
-    // If the video is not in flv format, we can use the native plyr and add sources directly with the video URL
-    plyrSource['sources'] = [{ src: videoUrl }]
-  }
-  return <Plyr id="plyr" source={plyrSource as Plyr.SourceInfo} options={plyrOptions} />
+
+  return <Plyr id="plyr" source={plyrSource} options={plyrOptions} />
 }
 
+// Rest of your VideoPreview component remains exactly the same
 const VideoPreview: FC<{ file: OdFileObject }> = ({ file }) => {
   const { asPath } = useRouter()
   const hashedToken = getStoredToken(asPath)
   const clipboard = useClipboard()
-
   const [menuOpen, setMenuOpen] = useState(false)
   const { t } = useTranslation()
 
-  // OneDrive generates thumbnails for its video files, we pick the thumbnail with the highest resolution
   const thumbnail = `/api/thumbnail/?path=${asPath}&size=large${hashedToken ? `&odpt=${hashedToken}` : ''}`
-
-  // We assume subtitle files are beside the video with the same name, only webvtt '.vtt' files are supported
   const vtt = `${asPath.substring(0, asPath.lastIndexOf('.'))}.vtt`
   const subtitle = `/api/raw/?path=${vtt}${hashedToken ? `&odpt=${hashedToken}` : ''}`
-
-  // We also format the raw video file for the in-browser player as well as all other players
   const videoUrl = `/api/raw/?path=${asPath}${hashedToken ? `&odpt=${hashedToken}` : ''}`
-
   const isFlv = getExtension(file.name) === 'flv'
-  const {
-    loading,
-    error,
-    result: mpegts,
-  } = useAsync(async () => {
-    if (isFlv) {
-      return (await import('mpegts.js')).default
-    }
+
+  const { loading, error, result: mpegts } = useAsync(async () => {
+    if (isFlv) return (await import('mpegts.js')).default
   }, [isFlv])
 
   return (
@@ -148,7 +146,6 @@ const VideoPreview: FC<{ file: OdFileObject }> = ({ file }) => {
             btnText={t('Customise link')}
             btnIcon="pen"
           />
-
           <DownloadButton
             onClickCallback={() => window.open(`iina://weblink?url=${getBaseUrl()}${videoUrl}`)}
             btnText="IINA"
