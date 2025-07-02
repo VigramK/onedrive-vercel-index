@@ -1,7 +1,7 @@
 <div align="center">
   <img src="./public/header.png" alt="onedrive-vercel-index" />
   <h3><a href="https://drive.swo.moe">onedrive-vercel-index</a></h3>
-  <p><a href="https://ovi.swo.moe/docs/getting-started">Get started</a> · <a href="https://ovi.swo.moe/blog/whats-new">What's new?</a> · <a href="https://ovi.swo.moe/sponsor/ways">Sponsoring</a></p>
+  <p><a href="https://ovi.swo.moe/docs/getting-started">Get started</a> · <a href="https://ovi.swo.moe/blog/whats-new">What's new?</a></p>
   <p><em>OneDrive public directory listing, powered by Vercel and Next.js</em></p>
 
   <img src="https://img.shields.io/badge/OneDrive-2C68C3?style=flat&logo=microsoft-onedrive&logoColor=white" alt="OneDrive" />
@@ -28,11 +28,9 @@ Showcase, share, preview, and download files inside *your* OneDrive with onedriv
 
 ## Discussion
 
-Please go to our [discussion forum](https://github.com/spencerwooo/onedrive-vercel-index/discussions) for general questions and FAQs, **issues are for bug reports and bug reports only.** Feature requests may or may not be ignored, as [I (@spencerwooo)](https://spencerwoo.com) am the only one maintaining the project, so **I only prioritise features that I use.**
+Please go to our [discussion forum](https://github.com/spencerwooo/onedrive-vercel-index/discussions) for general questions and FAQs, **issues are for bug reports and bug reports only.** Feature requests may or may not be ignored, as [(@spencerwooo)](https://spencerwoo.com) was the only one maintaining the project.
 
 *If you happen to like this project, please give it a star!* :3
-
-*If you really, really like this project, please send money! -> [Sponsors 🤑 and donations 💰](https://ovi.swo.moe/sponsor/ways)*
 
 ## Demo
 
@@ -132,17 +130,6 @@ Documentation is hosted at [ovi.swo.moe](https://ovi.swo.moe/).
 
 Yes! Completely free with no backend server what-so-ever. (Well, we use Redis, but that's free to some extent also.)
 
-## Sponsors and donations
-
-Open-source is hard! If you happen to like this project and want me to keep going, please consider sponsoring me or providing a single donation! Thanks for all the love and support!
-
-[🧸 Please donate - 微信/支付宝](https://ovi.swo.moe/sponsor/ways) · [Patreon](https://www.patreon.com/spencerwoo) · [爱发电](https://afdian.net/@spencerwoo)
-
 ## License
 
 [MIT](LICENSE)
-
-<div align="center">
-  <img src="./public/footer.png" />
-  <em>made with ❤️ by <a href="https://spencerwoo.com">spencer woo</a></em>
-</div>
