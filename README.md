@@ -32,10 +32,6 @@ Please go to our [discussion forum](https://github.com/spencerwooo/onedrive-verc
 
 *If you happen to like this project, please give it a star!* :3
 
-## Demo
-
-Live demo at [Spencer's OneDrive](https://drive.swo.moe).
-
 ![demo](./public/demo.png)
 
 ## Features
