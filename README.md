@@ -129,3 +129,5 @@ Yes! Completely free with no backend server what-so-ever. (Well, we use Redis, b
 ## License
 
 [MIT](LICENSE)
+
+Push to Deploy
